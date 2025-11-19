@@ -53,9 +53,9 @@ function createVinilCard(vinil) {
     card.className = 'vinil-card';
     card.dataset.vinilId = vinil.id;
 
-    // Mapa de cores para os backgrounds
+    // Mapa de cores para os backgrounds - cores mais vibrantes
     const corMap = {
-        'Preto': '#1a1a1a',
+        'Preto': '#2a2a2a',
         'Colorido': 'linear-gradient(135deg, #e91e63, #9c27b0)',
         'Transparente': '#2196f3',
         'Roxo': '#9c27b0'
@@ -64,8 +64,11 @@ function createVinilCard(vinil) {
     const bgStyle = corMap[vinil.cor_prensagem] || '#333333';
     const isGradient = bgStyle.includes('gradient');
     
-    // Usa a imagem da capa se existir, senão cria SVG
-    let imgUrl;
+    // Cria SVG placeholder inline com melhor visibilidade
+    const svgPlaceholder = `data:image/svg+xml,%3Csvg width='400' height='400' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E${isGradient ? `%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23e91e63'/%3E%3Cstop offset='100%25' style='stop-color:%239c27b0'/%3E%3C/linearGradient%3E` : ''}%3C/defs%3E%3Crect width='400' height='400' fill='${isGradient ? 'url(%23grad)' : bgStyle}'/%3E%3Ccircle cx='200' cy='200' r='150' fill='none' stroke='rgba(255,255,255,0.2)' stroke-width='3'/%3E%3Ccircle cx='200' cy='200' r='100' fill='none' stroke='rgba(255,255,255,0.15)' stroke-width='2'/%3E%3Ccircle cx='200' cy='200' r='50' fill='none' stroke='rgba(255,255,255,0.1)' stroke-width='1'/%3E%3Ccircle cx='200' cy='200' r='25' fill='rgba(255,152,0,0.3)'/%3E%3Ctext x='200' y='340' font-family='Arial' font-size='14' font-weight='bold' fill='rgba(255,152,0,0.7)' text-anchor='middle'%3ESem Capa%3C/text%3E%3C/svg%3E`;
+    
+    // Usa a imagem da capa se existir, senão usa SVG
+    let imgUrl = svgPlaceholder;
     if (vinil.capa) {
         // Se for URL relativa, adiciona o base URL da API
         if (vinil.capa.startsWith('/uploads')) {
@@ -73,9 +76,6 @@ function createVinilCard(vinil) {
         } else {
             imgUrl = vinil.capa;
         }
-    } else {
-        // Cria uma imagem SVG inline ao invés de usar placeholder externo
-        imgUrl = `data:image/svg+xml,%3Csvg width='400' height='400' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E${isGradient ? `%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23e91e63'/%3E%3Cstop offset='100%25' style='stop-color:%239c27b0'/%3E%3C/linearGradient%3E` : ''}%3C/defs%3E%3Crect width='400' height='400' fill='${isGradient ? 'url(%23grad)' : bgStyle}'/%3E%3Ccircle cx='200' cy='200' r='150' fill='none' stroke='rgba(255,255,255,0.1)' stroke-width='2'/%3E%3Ccircle cx='200' cy='200' r='100' fill='none' stroke='rgba(255,255,255,0.1)' stroke-width='2'/%3E%3Ccircle cx='200' cy='200' r='20' fill='rgba(255,255,255,0.2)'/%3E%3Ctext x='200' y='220' font-family='Arial' font-size='16' fill='rgba(255,255,255,0.6)' text-anchor='middle'%3E${encodeURIComponent(vinil.album.substring(0, 15))}%3C/text%3E%3C/svg%3E`;
     }
 
     // Badge da cor
@@ -86,7 +86,11 @@ function createVinilCard(vinil) {
 
     card.innerHTML = `
         <div class="vinil-card-image-wrapper">
-            <img src="${imgUrl}" alt="${vinil.album}" class="vinil-card-image">
+            <img src="${imgUrl}" 
+                 alt="${vinil.album}" 
+                 class="vinil-card-image"
+                 onerror="console.error('Erro ao carregar:', '${imgUrl}'); this.src='${svgPlaceholder}';"
+                 onload="console.log('✅ Imagem carregada:', '${imgUrl}');">
             <div class="vinil-card-badges">
                 <span class="badge badge-${corClass}">${escapeHTML(vinil.cor_prensagem)}</span>
                 ${vinil.midia === 'LP' ? '<span class="badge badge-lp">LP</span>' : ''}
@@ -139,7 +143,7 @@ export async function showVinilDetailsModal(id) {
  */
 function createVinilDetailsHTML(vinil) {
     const corMap = {
-        'Preto': '#1a1a1a',
+        'Preto': '#2a2a2a',
         'Colorido': 'linear-gradient(135deg, #e91e63, #9c27b0)',
         'Transparente': '#2196f3',
         'Roxo': '#9c27b0'
@@ -148,8 +152,19 @@ function createVinilDetailsHTML(vinil) {
     const bgStyle = corMap[vinil.cor_prensagem] || '#333333';
     const isGradient = bgStyle.includes('gradient');
     
-    // SVG inline para modal (maior)
-    const svgPlaceholder = `data:image/svg+xml,%3Csvg width='600' height='600' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E${isGradient ? `%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23e91e63'/%3E%3Cstop offset='100%25' style='stop-color:%239c27b0'/%3E%3C/linearGradient%3E` : ''}%3C/defs%3E%3Crect width='600' height='600' fill='${isGradient ? 'url(%23grad)' : bgStyle}'/%3E%3Ccircle cx='300' cy='300' r='220' fill='none' stroke='rgba(255,255,255,0.1)' stroke-width='3'/%3E%3Ccircle cx='300' cy='300' r='150' fill='none' stroke='rgba(255,255,255,0.1)' stroke-width='2'/%3E%3Ccircle cx='300' cy='300' r='30' fill='rgba(255,255,255,0.2)'/%3E%3Ctext x='300' y='320' font-family='Arial' font-size='20' fill='rgba(255,255,255,0.7)' text-anchor='middle'%3E${encodeURIComponent(vinil.album.substring(0, 20))}%3C/text%3E%3C/svg%3E`;
+    // SVG inline para modal (maior) - placeholder melhorado
+    const svgPlaceholder = `data:image/svg+xml,%3Csvg width='600' height='600' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E${isGradient ? `%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23e91e63'/%3E%3Cstop offset='100%25' style='stop-color:%239c27b0'/%3E%3C/linearGradient%3E` : ''}%3C/defs%3E%3Crect width='600' height='600' fill='${isGradient ? 'url(%23grad)' : bgStyle}'/%3E%3Ccircle cx='300' cy='300' r='220' fill='none' stroke='rgba(255,255,255,0.2)' stroke-width='4'/%3E%3Ccircle cx='300' cy='300' r='150' fill='none' stroke='rgba(255,255,255,0.15)' stroke-width='3'/%3E%3Ccircle cx='300' cy='300' r='80' fill='none' stroke='rgba(255,255,255,0.1)' stroke-width='2'/%3E%3Ccircle cx='300' cy='300' r='40' fill='rgba(255,152,0,0.3)'/%3E%3Ctext x='300' y='500' font-family='Arial' font-size='20' font-weight='bold' fill='rgba(255,152,0,0.7)' text-anchor='middle'%3ESem Capa%3C/text%3E%3C/svg%3E`;
+
+    // Usa a imagem da capa se existir, senão usa SVG
+    let imgUrl = svgPlaceholder;
+    if (vinil.capa) {
+        // Se for URL relativa, adiciona o base URL da API
+        if (vinil.capa.startsWith('/uploads')) {
+            imgUrl = `http://localhost:5000${vinil.capa}`;
+        } else {
+            imgUrl = vinil.capa;
+        }
+    }
 
     // Determina raridade baseada na cor
     const raridadeMap = {
@@ -168,7 +183,11 @@ function createVinilDetailsHTML(vinil) {
             </div>
             <div class="detalhes-vinil-content">
                 <div class="detalhes-vinil-image-wrapper">
-                    <img src="${svgPlaceholder}" alt="${vinil.album}" class="detalhes-vinil-image">
+                    <img src="${imgUrl}" 
+                         alt="${vinil.album}" 
+                         class="detalhes-vinil-image"
+                         onerror="console.error('Erro ao carregar imagem no modal:', '${imgUrl}'); this.src='${svgPlaceholder}';"
+                         onload="console.log('✅ Imagem do modal carregada:', '${imgUrl}');">
                 </div>
                 <div class="detalhes-vinil-info">
                     <div class="detalhes-vinil-artist-section">

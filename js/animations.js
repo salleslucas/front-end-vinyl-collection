@@ -10,6 +10,12 @@
  * Faz os cards aparecerem em sequência
  */
 export function animateCards() {
+    // Verifica se GSAP está disponível
+    if (typeof gsap === 'undefined') {
+        console.warn('GSAP não está carregado. Pulando animação.');
+        return;
+    }
+    
     const cards = document.querySelectorAll('.vinil-card');
     
     gsap.from(cards, {
@@ -28,6 +34,12 @@ export function animateCards() {
  * @param {string} selector - Seletor CSS do modal content
  */
 export function animateModal(selector) {
+    // Verifica se GSAP está disponível
+    if (typeof gsap === 'undefined') {
+        console.warn('GSAP não está carregado. Pulando animação.');
+        return;
+    }
+    
     const modalContent = document.querySelector(selector);
     
     if (!modalContent) return;
@@ -95,6 +107,12 @@ export function animateModalClose(selector, callback) {
  * @param {string} selector - Seletor CSS das seções
  */
 export function animateSections(selector) {
+    // Verifica se GSAP está disponível
+    if (typeof gsap === 'undefined') {
+        console.warn('GSAP não está carregado. Pulando animação.');
+        return;
+    }
+    
     const elements = document.querySelectorAll(selector);
     
     if (elements.length === 0) return;
