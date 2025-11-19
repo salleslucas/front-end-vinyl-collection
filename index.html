@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vinyl Collection - Sua biblioteca pessoal de discos</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- GSAP via CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="20" cy="20" r="18" stroke="currentColor" stroke-width="2"/>
+                        <circle cx="20" cy="20" r="12" stroke="currentColor" stroke-width="2"/>
+                        <circle cx="20" cy="20" r="3" fill="currentColor"/>
+                    </svg>
+                    <div class="logo-text">
+                        <h1>Vinyl Collection</h1>
+                        <p>Sua biblioteca pessoal de discos</p>
+                    </div>
+                </div>
+                <button class="btn-add-vinil" id="btn-adicionar">
+                    <span>+</span> Adicionar Vinil
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Stats Cards -->
+    <section class="stats-cards-section">
+        <div class="container">
+            <div class="stats-cards" id="stats-cards">
+                <div class="stat-card-mini">
+                    <div class="stat-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="12" cy="12" r="3" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="total-vinis">0</div>
+                        <div class="stat-label">Total de Vinis</div>
+                    </div>
+                </div>
+                <div class="stat-card-mini">
+                    <div class="stat-icon" style="color: #e91e63;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="total-raridades">0</div>
+                        <div class="stat-label">Raridades</div>
+                    </div>
+                </div>
+                <div class="stat-card-mini">
+                    <div class="stat-icon" style="color: #9c27b0;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 3H21V5H3V3ZM3 7H21V9H3V7ZM3 11H21V13H3V11ZM3 15H21V17H3V15ZM3 19H21V21H3V19Z" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="total-artistas">0</div>
+                        <div class="stat-label">Artistas</div>
+                    </div>
+                </div>
+                <div class="stat-card-mini">
+                    <div class="stat-icon" style="color: #ff9800;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+                            <path d="M3 9H21" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="ano-mais-antigo">----</div>
+                        <div class="stat-label">Mais Antigo</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filters and Search -->
+    <section class="filters-section">
+        <div class="container">
+            <div class="filters-bar">
+                <div class="search-box">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM18 18l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <input 
+                        type="text" 
+                        id="search-input" 
+                        class="search-input" 
+                        placeholder="Buscar por álbum ou artista..."
+                    >
+                </div>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="todos">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        Todos
+                    </button>
+                    <select class="filter-select" id="filter-cor">
+                        <option value="">Todas as Cores</option>
+                    </select>
+                    <select class="filter-select" id="filter-midia">
+                        <option value="">Todos os Tipos</option>
+                        <option value="LP">LP</option>
+                        <option value="Compacto">Compacto</option>
+                        <option value="EP">EP</option>
+                    </select>
+                    <button class="btn-icon" id="btn-stats" title="Ver Estatísticas">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 17V7M10 17V3M17 17v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Loading -->
+            <div id="loading" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Carregando vinis...</p>
+            </div>
+
+            <!-- Vinis Grid -->
+            <div id="vinis-grid" class="vinis-grid"></div>
+
+            <!-- No Results -->
+            <div id="no-results" class="no-results" style="display: none;">
+                <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="32" cy="32" r="30" stroke="currentColor" stroke-width="2" opacity="0.3"/>
+                    <circle cx="32" cy="32" r="20" stroke="currentColor" stroke-width="2" opacity="0.3"/>
+                </svg>
+                <h3>Nenhum vinil encontrado</h3>
+                <p>Tente ajustar os filtros ou adicione novos vinis à sua coleção</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Detalhes -->
+    <div id="modal-detalhes" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content modal-details">
+            <button class="modal-close" id="modal-detalhes-close-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </button>
+            <div id="detalhes-content"></div>
+        </div>
+    </div>
+
+    <!-- Modal Adicionar/Editar -->
+    <div id="modal-form" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-form-title">➕ Adicionar Novo Vinil</h3>
+                <button class="modal-close" id="modal-form-close-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="form-vinil">
+                    <!-- Upload de Imagem -->
+                    <div class="form-group-full">
+                        <label for="form-capa">
+                            <span class="form-icon">🖼️</span> Imagem da Capa
+                        </label>
+                        <div class="image-upload-container">
+                            <div class="image-preview" id="image-preview">
+                                <svg class="preview-placeholder" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke-width="2"/>
+                                    <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/>
+                                    <polyline points="21 15 16 10 5 21" stroke-width="2"/>
+                                </svg>
+                                <img id="preview-img" style="display: none;" alt="Preview">
+                            </div>
+                            <div class="upload-controls">
+                                <input type="file" id="form-capa" accept="image/*" style="display: none;">
+                                <button type="button" class="btn-upload" id="btn-select-image">
+                                    📁 Selecionar Imagem
+                                </button>
+                                <button type="button" class="btn-remove-image" id="btn-remove-image" style="display: none;">
+                                    🗑️ Remover
+                                </button>
+                                <p class="upload-hint">JPG, PNG, GIF ou WEBP (máx. 5MB)</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="form-artista">
+                                <span class="form-icon">🎤</span> Artista / Banda *
+                            </label>
+                            <input type="text" id="form-artista" class="form-input" placeholder="Ex: Pink Floyd" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-album">
+                                <span class="form-icon">💿</span> Álbum *
+                            </label>
+                            <input type="text" id="form-album" class="form-input" placeholder="Ex: The Dark Side of the Moon" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="form-cor">
+                                <span class="form-icon">🎨</span> Cor da Prensagem *
+                            </label>
+                            <select id="form-cor" class="form-input" required>
+                                <option value="">Selecione a cor</option>
+                                <option value="Preto">🖤 Preto</option>
+                                <option value="Colorido">🌈 Colorido</option>
+                                <option value="Transparente">💎 Transparente</option>
+                                <option value="Roxo">💜 Roxo</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-ano">
+                                <span class="form-icon">📅</span> Ano *
+                            </label>
+                            <input type="number" id="form-ano" class="form-input" min="1900" max="2025" placeholder="Ex: 1973" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="form-selo">
+                                <span class="form-icon">🏢</span> Selo/Gravadora
+                            </label>
+                            <input type="text" id="form-selo" class="form-input" placeholder="Ex: Harvest Records">
+                        </div>
+                        <div class="form-group">
+                            <label for="form-midia">
+                                <span class="form-icon">💽</span> Tipo de Mídia *
+                            </label>
+                            <select id="form-midia" class="form-input" required>
+                                <option value="">Selecione o tipo</option>
+                                <option value="LP">💿 LP (Long Play)</option>
+                                <option value="Compacto">💾 Compacto (Single)</option>
+                                <option value="EP">📀 EP (Extended Play)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="btn-cancel-form">Cancelar</button>
+                        <button type="submit" class="btn-primary">
+                            <span>✓</span> Adicionar à Coleção
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Stats -->
+    <div id="modal-stats" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3>Estatísticas da Coleção</h3>
+                <button class="modal-close" id="modal-stats-close-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="stats-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Vinyl Collection - Desenvolvido por Lucas Salles</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
