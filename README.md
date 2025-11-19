@@ -44,25 +44,8 @@ const API_BASE_URL = 'http://localhost:5000';
 
 Você tem várias opções:
 
-#### Opção A: Abrir diretamente no navegador
+#### Abrir diretamente no navegador
 - Abra o arquivo `index.html` no navegador
-
-#### Opção B: Usar um servidor HTTP local
-
-**Python:**
-```bash
-# Python 3
-python -m http.server 8000
-
-# Acesse: http://localhost:8000
-```
-
-**Node.js (http-server):**
-```bash
-npx http-server -p 8000
-
-# Acesse: http://localhost:8000
-```
 
 **VS Code:**
 - Instale a extensão "Live Server"
@@ -217,5 +200,6 @@ O layout é totalmente responsivo:
 ## 📄 Licença
 
 Projeto desenvolvido para o MVP da Sprint 1 - PUC Rio por Lucas de Almeida Salles
+
 
 
