@@ -237,9 +237,17 @@ function createVinilDetailsHTML(vinil) {
                         </div>
                     </div>
                     
-                    <button class="btn-rare-item">
-                        <span>⭐</span> Item Raro na Coleção
-                    </button>
+                    <div class="detalhes-vinil-actions">
+                        <button class="btn-rare-item">
+                            <span>⭐</span> Item Raro na Coleção
+                        </button>
+                        <button class="btn-edit-vinil" data-vinil-id="${vinil.id}">
+                            <span>✏️</span> Editar Vinil
+                        </button>
+                        <button class="btn-delete-vinil" data-vinil-id="${vinil.id}">
+                            <span>🗑️</span> Deletar da Coleção
+                        </button>
+                    </div>
                 </div>
             </div>
             

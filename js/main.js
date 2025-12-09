@@ -51,7 +51,7 @@ async function loadVinis() {
 }
 
 /**
- * Busca vinis por artista
+ * Busca vinis por artista ou álbum
  * @param {string} termo - Termo de busca
  */
 async function buscarVinis(termo) {
@@ -65,7 +65,7 @@ async function buscarVinis(termo) {
     try {
         ui.showLoading();
         appState.isSearching = true;
-        const vinis = await api.buscarPorArtista(termo);
+        const vinis = await api.buscarVinis(termo);
         appState.currentVinis = vinis;
         ui.renderVinisGrid(vinis);
     } catch (error) {
@@ -117,12 +117,16 @@ async function compararPrensagens() {
 }
 
 /**
- * Processa o submit do formulário de adicionar vinil
+ * Processa o submit do formulário de adicionar/editar vinil
  */
 async function handleFormSubmit() {
     const form = document.getElementById('form-vinil');
     const submitBtn = form.querySelector('button[type="submit"]');
     const originalBtnText = submitBtn.innerHTML;
+    
+    // Verifica se é edição ou criação
+    const editId = form.dataset.editId;
+    const isEdit = !!editId;
 
     try {
         // Desabilita o botão durante o envio
@@ -156,24 +160,33 @@ async function handleFormSubmit() {
             return;
         }
 
-        console.log('📤 Enviando vinil para a API:', vinilData);
+        console.log(`📤 ${isEdit ? 'Atualizando' : 'Enviando'} vinil para a API:`, vinilData);
 
-        // Envia para a API
-        const novoVinil = await api.adicionarVinil(vinilData);
-
-        console.log('✅ Vinil adicionado com sucesso:', novoVinil);
+        // Envia para a API (POST ou PUT)
+        let resultado;
+        if (isEdit) {
+            resultado = await api.atualizarVinil(editId, vinilData);
+            console.log('✅ Vinil atualizado com sucesso:', resultado);
+        } else {
+            resultado = await api.adicionarVinil(vinilData);
+            console.log('✅ Vinil adicionado com sucesso:', resultado);
+        }
 
         // Fecha o modal
         ui.hideModal('modal-form');
 
         // Mostra mensagem de sucesso
-        ui.showSuccess(`Vinil "${novoVinil.album}" adicionado com sucesso!`);
+        const mensagem = isEdit 
+            ? `Vinil "${resultado.album}" atualizado com sucesso!`
+            : `Vinil "${resultado.album}" adicionado com sucesso!`;
+        ui.showSuccess(mensagem);
 
         // Recarrega a listagem
         await loadVinis();
 
         // Limpa o formulário e preview
         form.reset();
+        delete form.dataset.editId;
         clearImagePreview();
 
     } catch (error) {
@@ -183,6 +196,100 @@ async function handleFormSubmit() {
         // Reabilita o botão
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalBtnText;
+    }
+}
+
+/**
+ * Deleta um vinil da coleção
+ * @param {number} id - ID do vinil a ser deletado
+ */
+async function handleDeleteVinil(id) {
+    try {
+        // Solicita confirmação
+        const confirmacao = confirm('Tem certeza que deseja deletar este vinil da sua coleção? Esta ação não pode ser desfeita.');
+        
+        if (!confirmacao) {
+            return;
+        }
+
+        console.log(`🗑️ Deletando vinil ID: ${id}`);
+
+        // Chama a API de deleção
+        await api.deletarVinil(id);
+
+        console.log('✅ Vinil deletado com sucesso');
+
+        // Fecha o modal de detalhes
+        ui.hideModal('modal-detalhes');
+
+        // Mostra mensagem de sucesso
+        ui.showSuccess('Vinil deletado com sucesso da sua coleção!');
+
+        // Recarrega a listagem
+        await loadVinis();
+
+    } catch (error) {
+        console.error('❌ Erro ao deletar vinil:', error);
+        ui.showError(`Erro ao deletar vinil: ${error.message}`);
+    }
+}
+
+/**
+ * Abre o modal de formulário em modo de edição
+ * @param {number} id - ID do vinil a ser editado
+ */
+async function handleEditVinil(id) {
+    try {
+        console.log(`✏️ Editando vinil ID: ${id}`);
+
+        // Busca os dados do vinil
+        const vinil = await api.getVinilById(id);
+
+        // Fecha o modal de detalhes
+        ui.hideModal('modal-detalhes');
+
+        // Abre o modal de formulário
+        const modal = document.getElementById('modal-form');
+        const title = document.getElementById('modal-form-title');
+        const form = document.getElementById('form-vinil');
+
+        // Muda o título
+        title.textContent = '✏️ Editar Vinil';
+
+        // Preenche os campos do formulário
+        document.getElementById('form-artista').value = vinil.artista;
+        document.getElementById('form-album').value = vinil.album;
+        document.getElementById('form-cor').value = vinil.cor_prensagem;
+        document.getElementById('form-ano').value = vinil.ano;
+        document.getElementById('form-selo').value = vinil.selo || '';
+        document.getElementById('form-midia').value = vinil.midia;
+
+        // Armazena o ID no formulário para saber que é edição
+        form.dataset.editId = id;
+
+        // Se houver imagem, mostra o preview
+        if (vinil.capa) {
+            const preview = document.getElementById('preview-img');
+            const btnRemove = document.getElementById('btn-remove-image');
+            const placeholder = document.querySelector('.preview-placeholder');
+
+            let imgUrl = vinil.capa;
+            if (vinil.capa.startsWith('/uploads')) {
+                imgUrl = `http://localhost:5000${vinil.capa}`;
+            }
+
+            preview.src = imgUrl;
+            preview.style.display = 'block';
+            btnRemove.style.display = 'block';
+            if (placeholder) placeholder.style.display = 'none';
+        }
+
+        // Abre o modal
+        modal.classList.add('active');
+
+    } catch (error) {
+        console.error('❌ Erro ao carregar vinil para edição:', error);
+        ui.showError(`Erro ao carregar vinil: ${error.message}`);
     }
 }
 
@@ -274,11 +381,21 @@ function setupEventListeners() {
     // Botão adicionar vinil
     document.getElementById('btn-adicionar')?.addEventListener('click', () => {
         const modal = document.getElementById('modal-form');
+        const title = document.getElementById('modal-form-title');
+        const form = document.getElementById('form-vinil');
+        
         if (modal) {
-            modal.classList.add('active');
+            // Reseta o título para modo de criação
+            title.textContent = '➕ Adicionar Novo Vinil';
+            
             // Limpa o formulário e preview de imagem
-            document.getElementById('form-vinil')?.reset();
+            form?.reset();
             clearImagePreview();
+            
+            // Remove o ID de edição se existir
+            delete form.dataset.editId;
+            
+            modal.classList.add('active');
         }
     });
 
@@ -373,6 +490,26 @@ function setupEventListeners() {
     // Modal de detalhes - overlay
     document.querySelector('#modal-detalhes .modal-overlay')?.addEventListener('click', () => {
         ui.hideModal('modal-detalhes');
+    });
+
+    // Event delegation para botão deletar (criado dinamicamente)
+    document.addEventListener('click', async (e) => {
+        if (e.target.closest('.btn-delete-vinil')) {
+            const btn = e.target.closest('.btn-delete-vinil');
+            const vinilId = parseInt(btn.dataset.vinilId);
+            if (vinilId) {
+                await handleDeleteVinil(vinilId);
+            }
+        }
+        
+        // Event delegation para botão editar (criado dinamicamente)
+        if (e.target.closest('.btn-edit-vinil')) {
+            const btn = e.target.closest('.btn-edit-vinil');
+            const vinilId = parseInt(btn.dataset.vinilId);
+            if (vinilId) {
+                await handleEditVinil(vinilId);
+            }
+        }
     });
 
     // Tecla ESC para fechar modais

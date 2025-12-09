@@ -33,6 +33,11 @@ async function fetchAPI(endpoint, options = {}) {
             throw new Error(errorData.message || `Erro HTTP: ${response.status}`);
         }
 
+        // Se for 204 No Content, retorna objeto vazio
+        if (response.status === 204) {
+            return {};
+        }
+
         return await response.json();
     } catch (error) {
         console.error(`Erro na requisição para ${endpoint}:`, error);
@@ -66,6 +71,42 @@ export async function buscarPorArtista(artista) {
     // Encode do parâmetro para segurança
     const encodedArtista = encodeURIComponent(artista);
     return fetchAPI(`/vinis/search?artista=${encodedArtista}`);
+}
+
+/**
+ * GET /vinis/search?album={nome} - Busca vinis por nome do álbum
+ * @param {string} album - Nome do álbum (ou parte dele)
+ * @returns {Promise<Array>} Array com vinis encontrados
+ */
+export async function buscarPorAlbum(album) {
+    const encodedAlbum = encodeURIComponent(album);
+    return fetchAPI(`/vinis/search?album=${encodedAlbum}`);
+}
+
+/**
+ * Busca vinis por artista OU álbum (busca combinada)
+ * @param {string} termo - Termo de busca
+ * @returns {Promise<Array>} Array com vinis encontrados
+ */
+export async function buscarVinis(termo) {
+    try {
+        // Busca por artista e álbum em paralelo
+        const [resultadosArtista, resultadosAlbum] = await Promise.all([
+            buscarPorArtista(termo).catch(() => []),
+            buscarPorAlbum(termo).catch(() => [])
+        ]);
+
+        // Combina os resultados e remove duplicatas
+        const todosResultados = [...resultadosArtista, ...resultadosAlbum];
+        const vinisUnicos = Array.from(
+            new Map(todosResultados.map(v => [v.id, v])).values()
+        );
+
+        return vinisUnicos;
+    } catch (error) {
+        console.error('Erro na busca:', error);
+        return [];
+    }
 }
 
 /**

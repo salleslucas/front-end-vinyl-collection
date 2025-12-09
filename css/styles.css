@@ -557,7 +557,8 @@ body {
 }
 
 .modal-details {
-    max-width: 800px;
+    max-width: 1000px;
+    width: 95%;
 }
 
 .modal-header {
@@ -823,26 +824,28 @@ select.form-input,
 
 .detalhes-vinil-content {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 400px 1fr;
     gap: var(--spacing-xl);
+    padding: 0 var(--spacing-lg);
 }
 
 .detalhes-vinil-image-wrapper {
     position: relative;
-    width: 100%;
-    padding-top: 100%;
+    width: 400px;
+    height: 400px;
     border-radius: 12px;
     overflow: hidden;
     background-color: var(--bg-tertiary);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    flex-shrink: 0;
+    margin-left: var(--spacing-sm);
 }
 
 .detalhes-vinil-image {
-    position: absolute;
-    top: 0;
-    left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
+    background-color: var(--bg-tertiary);
 }
 
 .detalhes-vinil-info {
@@ -852,7 +855,7 @@ select.form-input,
 }
 
 .detalhes-vinil-artist-section {
-    margin-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
 }
 
 .detalhes-vinil-artist {
@@ -907,8 +910,14 @@ select.form-input,
     font-weight: 600;
 }
 
-.btn-rare-item {
+.detalhes-vinil-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
     margin-top: var(--spacing-md);
+}
+
+.btn-rare-item {
     width: 100%;
     padding: var(--spacing-md);
     background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
@@ -928,6 +937,54 @@ select.form-input,
 .btn-rare-item:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(233, 30, 99, 0.4);
+}
+
+.btn-delete-vinil {
+    width: 100%;
+    padding: var(--spacing-md);
+    background: rgba(244, 67, 54, 0.1);
+    color: #f44336;
+    border: 1px solid rgba(244, 67, 54, 0.3);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.btn-delete-vinil:hover {
+    background: rgba(244, 67, 54, 0.2);
+    border-color: rgba(244, 67, 54, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+}
+
+.btn-edit-vinil {
+    width: 100%;
+    padding: var(--spacing-md);
+    background: rgba(33, 150, 243, 0.1);
+    color: #2196f3;
+    border: 1px solid rgba(33, 150, 243, 0.3);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.btn-edit-vinil:hover {
+    background: rgba(33, 150, 243, 0.2);
+    border-color: rgba(33, 150, 243, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
 }
 
 .detalhes-vinil-tracklist {
@@ -1130,6 +1187,14 @@ select.form-input,
     
     .detalhes-vinil-content {
         grid-template-columns: 1fr;
+    }
+    
+    .detalhes-vinil-image-wrapper {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1 / 1;
+        max-width: 400px;
+        margin: 0 auto;
     }
     
     .tracklist-grid {
